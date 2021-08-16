@@ -16,6 +16,7 @@ from ...utils import countries
 from ...utils import date as date_util
 from ...utils import httputils
 from . import LocationService
+from . import ModelFactory
 
 LOGGER = logging.getLogger("services.location.jhu")
 PID = os.getpid()
@@ -155,6 +156,9 @@ async def get_locations():
     #       incorrect data to consumers.
     # ***************************************************************************
     # Go through locations.
+    modelFactory = ModelFactory()
+    model_type = "timeline"
+
     for index, location in enumerate(locations_confirmed):
         # Get the timelines.
 
@@ -183,19 +187,19 @@ async def get_locations():
                 datetime.utcnow().isoformat() + "Z",
                 # Timelines (parse dates as ISO).
                 {
-                    "confirmed": Timeline(
-                        timeline={
+                    "confirmed": modelFactory.create_model(model_type,
+                        {
                             datetime.strptime(date, "%m/%d/%y").isoformat() + "Z": amount
                             for date, amount in timelines["confirmed"].items()
                         }
                     ),
-                    "deaths": Timeline(
-                        timeline={
+                    "deaths": modelFactory.create_model(model_type,
+                        {
                             datetime.strptime(date, "%m/%d/%y").isoformat() + "Z": amount
                             for date, amount in timelines["deaths"].items()
                         }
                     ),
-                    "recovered": Timeline(
+                    "recovered": modelFactory.create_model(model_type,
                         timeline={
                             datetime.strptime(date, "%m/%d/%y").isoformat() + "Z": amount
                             for date, amount in timelines["recovered"].items()
