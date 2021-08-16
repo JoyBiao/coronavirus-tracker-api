@@ -12,6 +12,7 @@ from ...location.nyt import NYTLocation
 from ...models import Timeline
 from ...utils import httputils
 from . import LocationService
+from . import ModelFactory
 
 LOGGER = logging.getLogger("services.location.nyt")
 
@@ -99,6 +100,8 @@ async def get_locations():
 
         # The normalized locations.
         locations = []
+        modelFactory = ModelFactory()
+        model_type = "timeline"
 
         for idx, (county_state, histories) in enumerate(grouped_locations.items()):
             # Make location history for confirmed and deaths from dates.
@@ -118,19 +121,19 @@ async def get_locations():
                     coordinates=Coordinates(None, None),  # NYT does not provide coordinates
                     last_updated=datetime.utcnow().isoformat() + "Z",  # since last request
                     timelines={
-                        "confirmed": Timeline(
-                            timeline={
+                        "confirmed": modelFactory.create_model(model_type, 
+                            {
                                 datetime.strptime(date, "%Y-%m-%d").isoformat() + "Z": amount
                                 for date, amount in confirmed_history.items()
                             }
                         ),
-                        "deaths": Timeline(
-                            timeline={
+                        "deaths": modelFactory.create_model(model_type,
+                            {
                                 datetime.strptime(date, "%Y-%m-%d").isoformat() + "Z": amount
                                 for date, amount in deaths_history.items()
                             }
                         ),
-                        "recovered": Timeline(),
+                        "recovered": modelFactory.create_model(model_type,{}),
                     },
                 )
             )
