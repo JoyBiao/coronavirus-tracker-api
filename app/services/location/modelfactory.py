@@ -1,4 +1,5 @@
 from ...models import *
+
 class ModelFactory():
     def create_model(self, type, data):
         """Factory Method"""
