@@ -1,5 +1,4 @@
 """app.services.location.basiclocationservice.py"""
-
 from . import LocationService
 
 class BasicLocationService(LocationService):
